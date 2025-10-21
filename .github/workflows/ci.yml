@@ -22,30 +22,30 @@ jobs:
     strategy:
       matrix:
         platform:
-          - {
-            runner: ubuntu-latest,
-            target: aarch64,
-            interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
-            maturin-args: "--release --out dist --zig"
-          }
-          - {
-            runner: ubuntu-latest,
-            target: armv7,
-            interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
-            maturin-args: "--release --out dist  --zig"
-          }
-          - {
-            runner: ubuntu-latest,
-            target: s390x,
-            interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
-            maturin-args: "--release --out dist  --zig"
-          }
-          - {
-            runner: ubuntu-latest,
-            target: ppc64le,
-            interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
-            maturin-args: "--release --out dist --zig"
-          }
+          #- {
+          #  runner: ubuntu-latest,
+          #  target: aarch64,
+          #  interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
+          #  maturin-args: "--release --out dist --zig"
+          #}
+          #- {
+          #  runner: ubuntu-latest,
+          #  target: armv7,
+          #  interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
+          #  maturin-args: "--release --out dist  --zig"
+          #}
+          #- {
+          #  runner: ubuntu-latest,
+          #  target: s390x,
+          #  interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
+          #  maturin-args: "--release --out dist  --zig"
+          #}
+         - {
+           runner: ubuntu-latest,
+           target: ppc64le,
+           interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11",
+           maturin-args: "--release --out dist --zig"
+         }
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
@@ -66,3 +66,38 @@ jobs:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
 
+  linuxtest:
+    name: "linuxtest (${{ matrix.platform.target }})"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform:
+          #- { target: aarch64-unknown-linux-gnu, interpreter: "3.10 3.11 3.12" }
+          #- { target: armv7-unknown-linux-gnueabihf, interpreter: "3.10 3.11 3.12" }
+          #- { target: s390x-unknown-linux-gnu, interpreter: "3.10 3.11 3.12" }
+          - {
+            target: powerpc64le-unknown-linux-gnu,
+            interpreter: "3.10 3.11 3.12 3.13 3.13t 3.14 3.14t pypy3.11"
+          }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: 3.x
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal  
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH  
+          uv pip install \
+                 maturin \
+                 'ziglang<0.14.0' \
+                 cffi \
+                 patchelf \
+                 --system
+      - name: "Build wheels"
+        run: |
+          maturin build --release --out dist --zig \  
+            --target ${{ matrix.platform.target }} \  
+            --interpreter ${{ matrix.platform.interpreter }}  
