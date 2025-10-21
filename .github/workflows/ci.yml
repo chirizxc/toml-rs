@@ -97,7 +97,6 @@ jobs:
             cffi \
             patchelf \
             --system
-          export CARGO_ZIGBUILD_TARGET=powerpc64le-unknown-linux-gnu          
           maturin build --release --out dist --zig \  
             --target powerpc64le-unknown-linux-gnu \  
             --interpreter ${{ matrix.platform.interpreter }}
