@@ -93,7 +93,7 @@ jobs:
           rustup target add powerpc64le-unknown-linux-gnu
           uv pip install \
             maturin \
-            'ziglang==0.15.1' \
+            'ziglang==0.14.0' \
             cffi \
             patchelf \
             --system
