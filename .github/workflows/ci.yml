@@ -88,14 +88,15 @@ jobs:
         with:
           enable-cache: true
       - run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal  
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH  
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           uv pip install \
-                 maturin \
-                 'ziglang==0.15.1' \
-                 cffi \
-                 patchelf \
-                 --system
-          maturin build --release --out dist --zig \  
-            --target ${{ matrix.platform.target }} \  
-            --interpreter ${{ matrix.platform.interpreter }}  
+            maturin \
+            'ziglang==0.15.1' \
+            cffi \
+            patchelf \
+            --system
+          maturin build --release --out dist --zig \
+            --target ${{ matrix.platform.target }} \
+            --interpreter ${{ matrix.platform.interpreter }}
+
