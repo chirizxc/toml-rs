@@ -92,12 +92,10 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH  
           uv pip install \
                  maturin \
-                 'ziglang<0.14.0' \
+                 'ziglang==0.15.1' \
                  cffi \
                  patchelf \
                  --system
-      - name: "Build wheels"
-        run: |
           maturin build --release --out dist --zig \  
             --target ${{ matrix.platform.target }} \  
             --interpreter ${{ matrix.platform.interpreter }}  
